@@ -1,0 +1,115 @@
+---
+title: "Package Dplyr"
+subtitle: "Cours FAS1002"  
+author: 
+  - "Cynthia Bello"
+output:
+  xaringan::moon_reader:
+    css: xaringan-themer.css
+    nature:
+      highlightStyle: solarized-dark
+      highlightLines: true
+      ratio: 16:9
+      countIncrementalSlides: TRUE
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+options(htmltools.dir.version = FALSE)
+knitr::opts_chunk$set(
+  fig.width=9, fig.height=3.5, fig.retina=3,
+  out.width = "100%",
+  cache = FALSE,
+  echo = TRUE,
+  message = FALSE, 
+  warning = FALSE,
+  hiline = TRUE
+)
+```
+
+```{r xaringan-themer, include=FALSE, warning=FALSE}
+library(xaringanthemer)
+library(tidyverse)
+style_solarized_dark(
+  text_color = "#FFFAF0",
+  header_color = "#8FBC8F",
+  background_color = "#2F4F4F",
+  link_color = "#FF69B4",
+  # code_font_family = "Fira Code",
+  # code_font_url = "https://cdn.jsdelivr.net/gh/tonsky/FiraCode@2/distr/fira_code.css"
+)
+```
+# Introduction
+
+
+---
+class: center
+
+# 🐧 Importation des données 🐧
+
+--
+Pour démontrer les fonctions de Dplyr, nous allons utilisé les données brutes 
+de [palmerpenguins](https://allisonhorst.github.io/palmerpenguins/reference/penguins_raw.html#format)
+
+```{r}
+library(palmerpenguins)
+data_penguin = (penguins_raw)
+
+```
+
+---
+class: inverse center middle
+
+# Les Fonctions de Dplyr
+
+---
+# Fonctions
+
+
+* Regrouper
+* Manipuler (données ou variables)
+* Résumer(données ou variables)
+* Fonctions vectorielles
+* Joindre des tableaux
+
+
+---
+
+# Regrouper
+
+
+
+
+---
+
+# Manipuler
+
+---
+
+
+
+# Résumer
+
+---
+
+
+
+# Fonctions vectorielles
+
+---
+
+
+# Joindre des tableaux
+
+
+---
+
+class: center, middle
+
+# MERCI :) 
+
+[**xaringan**](https://github.com/yihui/xaringan)<br>
+[gadenbuie/xaringanthemer](https://github.com/gadenbuie/xaringanthemer)
+
+
