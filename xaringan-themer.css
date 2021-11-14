@@ -45,18 +45,21 @@
   /* Colors */
   --text-color: #FFFAF0;
   --header-color: #8FBC8F;
-  --background-color: #2F4F4F;
+  --background-color: #181818;
   --link-color: #FF69B4;
-  --text-bold-color: #d33682;
-  --code-highlight-color: #268bd240;
-  --inverse-text-color: #002b36;
-  --inverse-background-color: #fdf6e3;
-  --inverse-header-color: #002b36;
+  --text-bold-color: #cbf7ed;
+  --code-highlight-color: rgba(255,255,0,0.5);
+  --inverse-text-color: #1E2523;
+  --inverse-background-color: #cbf7ed;
+  --inverse-header-color: #1E2523;
   --inverse-link-color: #FF69B4;
-  --title-slide-background-color: #fdf6e3;
-  --title-slide-text-color: #002b36;
+  --title-slide-background-color: #cbf7ed;
+  --title-slide-text-color: #1E2523;
   --header-background-color: #8FBC8F;
-  --header-background-text-color: #2F4F4F;
+  --header-background-text-color: #181818;
+  --base: #cbf7ed;
+  --white: #F4FDFB;
+  --black: #1E2523;
 }
 
 html {
@@ -97,10 +100,10 @@ h1, h2, h3 {
 }
 .remark-inline-code {
   font-size: var(--code-inline-font-size);
-  color: #6c71c4;
+  color: #cbf7ed;
 }
 .remark-slide-number {
-  color: #586e75;
+  color: #cbf7ed;
   opacity: 1;
   font-size: 0.9rem;
 }
@@ -148,10 +151,10 @@ a, a > code {
   float: left;
 }
 .left-column h2, .left-column h3 {
-  color: #586e75;
+  color: #cbf7ed99;
 }
 .left-column h2:last-of-type, .left-column h3:last-child {
-  color: #93a1a1;
+  color: #cbf7ed;
 }
 .right-column {
   width: 75%;
@@ -173,22 +176,22 @@ img, video, iframe {
   max-width: 100%;
 }
 blockquote {
-  border-left: solid 5px #cb4b16;
+  border-left: solid 5px #cbf7ed80;
   padding-left: 1em;
 }
 .remark-slide table {
   margin: auto;
-  border-top: 1px solid #657b83;
-  border-bottom: 1px solid #657b83;
+  border-top: 1px solid #666;
+  border-bottom: 1px solid #666;
 }
 .remark-slide table thead th {
-  border-bottom: 1px solid #657b83;
+  border-bottom: 1px solid #ddd;
 }
 th, td {
   padding: 5px;
 }
 .remark-slide thead, .remark-slide tfoot, .remark-slide tr:nth-child(even) {
-  background: #073642;
+  background: #3C4A47;
 }
 table.dataTable tbody {
   background-color: var(--background-color);
@@ -198,7 +201,7 @@ table.dataTable.display tbody tr.odd {
   background-color: var(--background-color);
 }
 table.dataTable.display tbody tr.even {
-  background-color: #073642;
+  background-color: #3C4A47;
 }
 table.dataTable.hover tbody tr:hover, table.dataTable.display tbody tr:hover {
   background-color: rgba(255, 255, 255, 0.5);
@@ -238,4 +241,22 @@ table.dataTable.hover tbody tr:hover, table.dataTable.display tbody tr:hover {
   }
 }
 
+.base {
+  color: var(--base);
+}
+.bg-base {
+  background-color: var(--base);
+}
+.white {
+  color: var(--white);
+}
+.bg-white {
+  background-color: var(--white);
+}
+.black {
+  color: var(--black);
+}
+.bg-black {
+  background-color: var(--black);
+}
 
