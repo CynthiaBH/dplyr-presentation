@@ -16,6 +16,7 @@ editor_options:
 ---
 ```{r setup, include=FALSE}
 options(htmltools.dir.version = FALSE)
+source("functions.R", local = knitr::knit_global())
 knitr::opts_chunk$set(
   fig.width=9, fig.height=3.5, fig.retina=3,
   out.width = "100%",
@@ -30,8 +31,9 @@ knitr::opts_chunk$set(
 ```{r xaringan-themer, include=FALSE, warning=FALSE}
 library(xaringanthemer)
 library(tidyverse)
+library(kableExtra)
 style_mono_dark(
-  text_color = "#FFFAF0",
+  text_color = "#F5F5F5",
   header_color = "#8FBC8F",
   background_color = "#181818",
   link_color = "#FF69B4",
@@ -43,13 +45,11 @@ style_mono_dark(
 # Introduction
 
 .pull-left[
-<img src="dplyr_logo.png" alt="Dplyr_logo" width="300"/>
+<img src="images/dplyr_logo.png" alt="Dplyr_logo" width="300"/>
 ]
 
 .pull-right[`Dplyr` est un package de l'univers Tidyverse qui a pour but de faciliter la manipulation de données. <br><br> `Dplyr` est fortement inspiré du package `plyr`, mais vient régler des problèmes de lenteur des programmes, en permettant de travailler avec des données contenues dans des bases de données externes.
 ]
-
-
 
 ---
 class: center
@@ -64,13 +64,14 @@ de [palmerpenguins](https://allisonhorst.github.io/palmerpenguins/reference/peng
 ```{r}
 library(palmerpenguins)
 data_penguin = (penguins_raw)
+data_penguin_tidy = (penguins)
 
 ```
-<img src="palmerpenguins.png" alt="PalmerPenguins" width="250"/>
+<img src="images/palmerpenguins.png" alt="PalmerPenguins" width="250"/>
 ]
 --
 .pull-right[
-<img src="apercu_tab.png" alt="Apercu_donnees" width=""/>
+<img src="images/apercu_tab.png" alt="Apercu_donnees" width=""/>
 ]
 
 ---
@@ -81,65 +82,203 @@ class: inverse center middle
 ---
 class: center, middle
 
-### Regrouper
-
+### Manipuler 
 --
 
 ### Sommaire 
+--
+
+### Regrouper 
+--
+
+### Fonctions vectorielles 
+--
+
+### Joindre des tableaux 
+
+---
+## Avant de commencer...
+.pull-left[
+Il y a certaines valeurs **N/A** parmi les variables numériques: 
+- `Culmen Length (mm)`
+- `Culmen Depth (mm)`
+- `Flipper Length (mm)`
+- `Body Mass (g)` 
+
+... qu'on aimerait "éliminer" pour faire certains calculs.
+
+]
+.pull-right[
+<img src="images/culmen.jpg" alt="Culmen" width="300"/>
+]
+
+Nous voulons quand même garder une version des données brutes, alors nous allons créer un autre *dataframe* pour nos calculs (moyenne par exemple) de la section **Sommaire**:  
+
+<center>`data_calcs`
+
+---
+# Manipuler
+### filter()  
+--
+
+
+```{r}
+ data_calcs <- data_penguin %>%
+     filter(across(c(10:13), ~ !is.na(.x)))
+```
+> *10:13 = les positions des colonnes : `Culmen Length (mm)`, `Culmen Depth (mm)`, `Flipper Length (mm)` et `Body Mass (g)`.*  
 
 --
 
-### Manipuler 
+<center>On vérifie si les rangées contenant des **NA** dans les colonnes choisies ci-haut, ont bel et bien été filtrées. 
+.pull-left[
+```{r}
+data_penguin %>% count()
+```
+] 
+.pull-right[
+```{r}
+data_calcs %>% count()
+```
+]  
 
+Ceci va nous éviter de spécifier **`!is.na`** ou **`na.rm = TRUE`** à chaque fois.
+
+---
+# Manipuler
+
+<u>**Objectif**</u> : "Nettoyer" nos données brutes pour arriver aux données *tidy* disponibles sur le site de [palmerpenguins](https://allisonhorst.github.io/palmerpenguins/reference/penguins_raw.html#format)
+
+
+
+---
+# Sommaire
+#### summarise():
+> summarise(.data, ..., .groups = NULL )
+
+```{r}
+data_calcs %>% summarise(mean_mass = mean(`Body Mass (g)`)) 
+data_calcs %>% summarise(med_flipper = median(`Flipper Length (mm)`)) 
+
+
+```
 --
+<u>Autres fonctions qui peuvent être utilisées avec `summarise()`:</u>  
+`sd(), IQR(), mad(),min(), max(), quantile(),first(), last(), nth(),n(), n_distinct(),any(), all()`
 
-### Fonctions vectorielles
+---
+# Sommaire
 
---
+.pull-left[
+<u>`summarise()`</u>: 
 
-### Joindre des tableaux
+```{r}
+data_calcs %>% summarise(mean_mass = mean(`Body Mass (g)`))  
+data_calcs %>% summarise(med_flipper = median(`Flipper Length (mm)`)) 
 
+```
+]
+.pull-right[
+<u>Base R</u> : 
+```{r}
+mean(data_calcs$`Body Mass (g)`)  
+median(data_calcs$`Flipper Length (mm)`) 
+```
+]
+---
+# Sommaire
+
+.pull-left[
+<u>`dplyr::summarise()`</u>: 
+
+```{r}
+data_calcs %>% summarise(
+  mean_mass = mean(`Body Mass (g)`), 
+  med_flipper = median(`Flipper Length (mm)`), 
+  max_culmen = max(`Culmen Length (mm)`))  
+```
+]
+.pull-right[
+<u>Base R</u> : 
+```{r}
+mean(data_calcs$`Body Mass (g)`)  
+median(data_calcs$`Flipper Length (mm)`) 
+max(data_calcs$`Culmen Length (mm)`) 
+```
+]
+---
+# Sommaire
+#### autres variantes de summarise():
+> `summarise_if()`
+
+```{r}
+dt <- data_calcs %>% group_by(Species) %>% summarise_if(is.numeric, list(maximum = max))
+```
+```{r echo=FALSE}
+show_table_sm(dt) 
+```
+
+Il y a aussi `summarise_at` et `summarise_all`
 
 ---
 
 # Regrouper
 
-.pull-left[
-### group_by()
-```{r}
-species <- data_penguin %>% group_by(Species) 
-species %>% summarize(body = mean(!is.na(`Body Mass (g)`)))
-
-```
-]
+### group_by() & ungroup()
+> `group_by(.data, ..., .add = FALSE, .drop = TRUE)`   
+> `ungroup(x, ...)`
 
 --
 
-<!-- .pull-left[ -->
-<!-- ### rowwise() -->
-
-
-<!-- ] -->
-
-<!-- -- -->
-
-<!-- .pull-right[ -->
-<!-- ### ungroup() -->
-
-
-<!-- ] -->
----
-
-# Sommaire
+```{r}
+dt <- data_penguin %>% group_by(Species) %>% summarize(Totals = n()) 
+```
+```{r echo=FALSE}
+show_table(dt)
+```
 
 ---
+  
+```{r}
+dt <- data_calcs %>% group_by(Sex) %>% summarize(mean_mass = mean(`Body Mass (g)`)) 
+```
+```{r echo=FALSE}
+dt <- arrondir(dt, "mean_mass", 0)
+show_table(dt)  
+```  
 
-# Manipuler
+--
 
+```{r}
+dt <- data_calcs %>% group_by(Region, Island) %>% summarize(mean_mass = mean(`Body Mass (g)`)) 
+``` 
+
+```{r echo=FALSE}
+dt <- arrondir(dt, "mean_mass", 0)
+show_table(dt)
+```  
 
 ---
+class: center, middle
 
+```{r}
+dt <- data_calcs %>% group_by(Species,Region, Island, Sex) %>% summarize(mean_mass = mean(`Body Mass (g)`))
 
+```  
+
+--
+
+```{r echo=FALSE}
+dt <- arrondir(dt,"mean_mass", 0)
+show_table(dt)
+```
+
+---
+# Regrouper
+### rowwise()
+> `rowwise(.data, ...)`
+
+---
 
 # Fonctions vectorielles
 
@@ -150,12 +289,12 @@ species %>% summarize(body = mean(!is.na(`Body Mass (g)`)))
 
 
 ---
-
 class: center, middle
 
 # MERCI :) 
 
 [**xaringan**](https://github.com/yihui/xaringan)<br>
-[gadenbuie/xaringanthemer](https://github.com/gadenbuie/xaringanthemer)
 
+---
+## Ressources:
 

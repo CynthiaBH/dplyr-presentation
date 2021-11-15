@@ -5,6 +5,8 @@
     <meta charset="utf-8" />
     <meta name="author" content="Cynthia Bello" />
     <script src="dplyr_pres_files/header-attrs/header-attrs.js"></script>
+    <script src="dplyr_pres_files/kePrint/kePrint.js"></script>
+    <link href="dplyr_pres_files/lightable/lightable.css" rel="stylesheet" />
     <link rel="stylesheet" href="xaringan-themer.css" type="text/css" />
   </head>
   <body>
@@ -24,13 +26,11 @@ class: center, middle, inverse, title-slide
 # Introduction
 
 .pull-left[
-&lt;img src="dplyr_logo.png" alt="Dplyr_logo" width="300"/&gt;
+&lt;img src="images/dplyr_logo.png" alt="Dplyr_logo" width="300"/&gt;
 ]
 
 .pull-right[`Dplyr` est un package de l'univers Tidyverse qui a pour but de faciliter la manipulation de données. &lt;br&gt;&lt;br&gt; `Dplyr` est fortement inspiré du package `plyr`, mais vient régler des problèmes de lenteur des programmes, en permettant de travailler avec des données contenues dans des bases de données externes.
 ]
-
-
 
 ---
 class: center
@@ -46,12 +46,13 @@ de [palmerpenguins](https://allisonhorst.github.io/palmerpenguins/reference/peng
 ```r
 library(palmerpenguins)
 data_penguin = (penguins_raw)
+data_penguin_tidy = (penguins)
 ```
-&lt;img src="palmerpenguins.png" alt="PalmerPenguins" width="250"/&gt;
+&lt;img src="images/palmerpenguins.png" alt="PalmerPenguins" width="250"/&gt;
 ]
 --
 .pull-right[
-&lt;img src="apercu_tab.png" alt="Apercu_donnees" width=""/&gt;
+&lt;img src="images/apercu_tab.png" alt="Apercu_donnees" width=""/&gt;
 ]
 
 ---
@@ -62,74 +63,498 @@ class: inverse center middle
 ---
 class: center, middle
 
-### Regrouper
-
+### Manipuler 
 --
 
 ### Sommaire 
+--
+
+### Regrouper 
+--
+
+### Fonctions vectorielles 
+--
+
+### Joindre des tableaux 
+
+---
+## Avant de commencer...
+.pull-left[
+Il y a certaines valeurs **N/A** parmi les variables numériques: 
+- `Culmen Length (mm)`
+- `Culmen Depth (mm)`
+- `Flipper Length (mm)`
+- `Body Mass (g)` 
+
+... qu'on aimerait "éliminer" pour faire certains calculs.
+
+]
+.pull-right[
+&lt;img src="images/culmen.jpg" alt="Culmen" width="300"/&gt;
+]
+
+Nous voulons quand même garder une version des données brutes, alors nous allons créer un autre *dataframe* pour nos calculs (moyenne par exemple) de la section **Sommaire**:  
+
+&lt;center&gt;`data_calcs`
+
+---
+# Manipuler
+### filter()  
+--
+
+
+
+```r
+ data_calcs &lt;- data_penguin %&gt;%
+     filter(across(c(10:13), ~ !is.na(.x)))
+```
+&gt; *10:13 = les positions des colonnes : `Culmen Length (mm)`, `Culmen Depth (mm)`, `Flipper Length (mm)` et `Body Mass (g)`.*  
 
 --
 
-### Manipuler 
+&lt;center&gt;On vérifie si les rangées contenant des **NA** dans les colonnes choisies ci-haut, ont bel et bien été filtrées. 
+.pull-left[
 
+```r
+data_penguin %&gt;% count()
+```
+
+```
+## # A tibble: 1 x 1
+##       n
+##   &lt;int&gt;
+## 1   344
+```
+] 
+.pull-right[
+
+```r
+data_calcs %&gt;% count()
+```
+
+```
+## # A tibble: 1 x 1
+##       n
+##   &lt;int&gt;
+## 1   342
+```
+]  
+
+Ceci va nous éviter de spécifier **`!is.na`** ou **`na.rm = TRUE`** à chaque fois.
+
+---
+# Manipuler
+
+&lt;u&gt;**Objectif**&lt;/u&gt; : "Nettoyer" nos données brutes pour arriver aux données *tidy* disponibles sur le site de [palmerpenguins](https://allisonhorst.github.io/palmerpenguins/reference/penguins_raw.html#format)
+
+
+
+---
+# Sommaire
+#### summarise():
+&gt; summarise(.data, ..., .groups = NULL )
+
+
+```r
+data_calcs %&gt;% summarise(mean_mass = mean(`Body Mass (g)`)) 
+```
+
+```
+## # A tibble: 1 x 1
+##   mean_mass
+##       &lt;dbl&gt;
+## 1     4202.
+```
+
+```r
+data_calcs %&gt;% summarise(med_flipper = median(`Flipper Length (mm)`)) 
+```
+
+```
+## # A tibble: 1 x 1
+##   med_flipper
+##         &lt;dbl&gt;
+## 1         197
+```
 --
+&lt;u&gt;Autres fonctions qui peuvent être utilisées avec `summarise()`:&lt;/u&gt;  
+`sd(), IQR(), mad(),min(), max(), quantile(),first(), last(), nth(),n(), n_distinct(),any(), all()`
 
-### Fonctions vectorielles
+---
+# Sommaire
 
---
+.pull-left[
+&lt;u&gt;`summarise()`&lt;/u&gt;: 
 
-### Joindre des tableaux
 
+```r
+data_calcs %&gt;% summarise(mean_mass = mean(`Body Mass (g)`))  
+```
+
+```
+## # A tibble: 1 x 1
+##   mean_mass
+##       &lt;dbl&gt;
+## 1     4202.
+```
+
+```r
+data_calcs %&gt;% summarise(med_flipper = median(`Flipper Length (mm)`)) 
+```
+
+```
+## # A tibble: 1 x 1
+##   med_flipper
+##         &lt;dbl&gt;
+## 1         197
+```
+]
+.pull-right[
+&lt;u&gt;Base R&lt;/u&gt; : 
+
+```r
+mean(data_calcs$`Body Mass (g)`)  
+```
+
+```
+## [1] 4201.754
+```
+
+```r
+median(data_calcs$`Flipper Length (mm)`) 
+```
+
+```
+## [1] 197
+```
+]
+---
+# Sommaire
+
+.pull-left[
+&lt;u&gt;`dplyr::summarise()`&lt;/u&gt;: 
+
+
+```r
+data_calcs %&gt;% summarise(
+  mean_mass = mean(`Body Mass (g)`), 
+  med_flipper = median(`Flipper Length (mm)`), 
+  max_culmen = max(`Culmen Length (mm)`))  
+```
+
+```
+## # A tibble: 1 x 3
+##   mean_mass med_flipper max_culmen
+##       &lt;dbl&gt;       &lt;dbl&gt;      &lt;dbl&gt;
+## 1     4202.         197       59.6
+```
+]
+.pull-right[
+&lt;u&gt;Base R&lt;/u&gt; : 
+
+```r
+mean(data_calcs$`Body Mass (g)`)  
+```
+
+```
+## [1] 4201.754
+```
+
+```r
+median(data_calcs$`Flipper Length (mm)`) 
+```
+
+```
+## [1] 197
+```
+
+```r
+max(data_calcs$`Culmen Length (mm)`) 
+```
+
+```
+## [1] 59.6
+```
+]
+---
+# Sommaire
+#### autres variantes de summarise():
+&gt; `summarise_if()`
+
+
+```r
+dt &lt;- data_calcs %&gt;% group_by(Species) %&gt;% summarise_if(is.numeric, list(maximum = max))
+```
+&lt;table class="table" style="font-size: 12px; width: auto !important; margin-left: auto; margin-right: auto;"&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; Species &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Sample Number_maximum &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Culmen Length (mm)_maximum &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Culmen Depth (mm)_maximum &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Flipper Length (mm)_maximum &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Body Mass (g)_maximum &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Delta 15 N (o/oo)_maximum &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Delta 13 C (o/oo)_maximum &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Adelie Penguin (Pygoscelis adeliae) &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 152 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 46.0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 21.5 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 210 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 4775 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; NA &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Chinstrap penguin (Pygoscelis antarctica) &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 68 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 58.0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 20.8 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 212 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 4800 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -23.78767 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Gentoo penguin (Pygoscelis papua) &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 124 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 59.6 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 17.3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 231 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6300 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; NA &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+Il y a aussi `summarise_at` et `summarise_all`
 
 ---
 
 # Regrouper
 
-.pull-left[
-### group_by()
+### group_by() &amp; ungroup()
+&gt; `group_by(.data, ..., .add = FALSE, .drop = TRUE)`   
+&gt; `ungroup(x, ...)`
+
+--
+
 
 ```r
-species &lt;- data_penguin %&gt;% group_by(Species) 
-species %&gt;% summarize(body = mean(!is.na(`Body Mass (g)`)))
+dt &lt;- data_penguin %&gt;% group_by(Species) %&gt;% summarize(Totals = n()) 
 ```
+&lt;table class="table" style="width: auto !important; margin-left: auto; margin-right: auto;"&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; Species &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Totals &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Adelie Penguin (Pygoscelis adeliae) &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 152 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Chinstrap penguin (Pygoscelis antarctica) &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 68 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Gentoo penguin (Pygoscelis papua) &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 124 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
 
+---
+  
+
+```r
+dt &lt;- data_calcs %&gt;% group_by(Sex) %&gt;% summarize(mean_mass = mean(`Body Mass (g)`)) 
 ```
-## # A tibble: 3 x 2
-##   Species                                    body
-##   &lt;chr&gt;                                     &lt;dbl&gt;
-## 1 Adelie Penguin (Pygoscelis adeliae)       0.993
-## 2 Chinstrap penguin (Pygoscelis antarctica) 1    
-## 3 Gentoo penguin (Pygoscelis papua)         0.992
-```
-]
+&lt;table class="table" style="width: auto !important; margin-left: auto; margin-right: auto;"&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; Sex &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; mean_mass &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; FEMALE &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3862 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; MALE &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 4546 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 4006 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
 
 --
 
-.pull-left[
+
+```r
+dt &lt;- data_calcs %&gt;% group_by(Region, Island) %&gt;% summarize(mean_mass = mean(`Body Mass (g)`)) 
+```
+
+&lt;table class="table" style="width: auto !important; margin-left: auto; margin-right: auto;"&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; Region &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Island &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; mean_mass &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Anvers &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Biscoe &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 4716 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Anvers &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Dream &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3713 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Anvers &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Torgersen &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3706 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+---
+class: center, middle
+
+
+```r
+dt &lt;- data_calcs %&gt;% group_by(Species,Region, Island, Sex) %&gt;% summarize(mean_mass = mean(`Body Mass (g)`))
+```
+
+--
+
+&lt;table class="table" style="width: auto !important; margin-left: auto; margin-right: auto;"&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; Species &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Region &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Island &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Sex &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; mean_mass &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Adelie Penguin (Pygoscelis adeliae) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Anvers &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Biscoe &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; FEMALE &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3369 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Adelie Penguin (Pygoscelis adeliae) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Anvers &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Biscoe &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; MALE &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 4050 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Adelie Penguin (Pygoscelis adeliae) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Anvers &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Dream &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; FEMALE &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3344 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Adelie Penguin (Pygoscelis adeliae) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Anvers &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Dream &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; MALE &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 4046 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Adelie Penguin (Pygoscelis adeliae) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Anvers &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Dream &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2975 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Adelie Penguin (Pygoscelis adeliae) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Anvers &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Torgersen &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; FEMALE &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3396 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Adelie Penguin (Pygoscelis adeliae) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Anvers &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Torgersen &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; MALE &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 4035 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Adelie Penguin (Pygoscelis adeliae) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Anvers &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Torgersen &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3681 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Chinstrap penguin (Pygoscelis antarctica) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Anvers &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Dream &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; FEMALE &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3527 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Chinstrap penguin (Pygoscelis antarctica) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Anvers &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Dream &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; MALE &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3939 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Gentoo penguin (Pygoscelis papua) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Anvers &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Biscoe &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; FEMALE &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 4680 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Gentoo penguin (Pygoscelis papua) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Anvers &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Biscoe &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; MALE &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5485 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Gentoo penguin (Pygoscelis papua) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Anvers &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Biscoe &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 4588 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+---
+# Regrouper
 ### rowwise()
-
-
-]
-
---
-
-.pull-right[
-### ungroup()
-
-
-]
----
-
-# Sommaire
+&gt; `rowwise(.data, ...)`
 
 ---
-
-# Manipuler
-
-
----
-
-
 
 # Fonctions vectorielles
 
@@ -140,14 +565,14 @@ species %&gt;% summarize(body = mean(!is.na(`Body Mass (g)`)))
 
 
 ---
-
 class: center, middle
 
 # MERCI :) 
 
 [**xaringan**](https://github.com/yihui/xaringan)&lt;br&gt;
-[gadenbuie/xaringanthemer](https://github.com/gadenbuie/xaringanthemer)
 
+---
+## Ressources:
 
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
