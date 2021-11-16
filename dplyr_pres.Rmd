@@ -76,7 +76,6 @@ class: center
 Pour démontrer les fonctions de Dplyr, nous allons utilisé les données brutes 
 de [palmerpenguins](https://allisonhorst.github.io/palmerpenguins/reference/penguins_raw.html#format)
 
-.pull-left[
 ```{r}
 library(palmerpenguins)
 data_penguin = (penguins_raw)
@@ -84,12 +83,12 @@ data_penguin_tidy = (penguins)
 
 ```
 <img src="images/palmerpenguins.png" alt="PalmerPenguins" width="250"/>
-]
---
-.pull-right[
-<img src="images/apercu_tab.png" alt="Apercu_donnees" width=""/>
-]
 
+---
+class: middle
+```{r echo=FALSE}
+show_head_sm(data_penguin)
+```
 ---
 class: inverse center middle
 
@@ -130,7 +129,7 @@ Il y a certaines valeurs **N/A** parmi les variables numériques:
 <img src="images/culmen.jpg" alt="Culmen" width="300"/>
 ]
 
-Nous voulons quand même garder une version des données brutes, alors nous allons créer un autre *dataframe* pour nos calculs (moyenne par exemple) de la section **Sommaire**:  
+Nous voulons quand même garder une version des données brutes, alors nous allons créer un autre *dataframe* pour nos calculs de la section **Sommaire**:  
 
 <center>`data_calcs`
 
@@ -285,9 +284,9 @@ Il y a aussi: `select_if, select_all, select_at`
 <u>Une réponse possible:</u>
 ```{r}
 data_penguin_clean %<>% rename(
-    bill_lenght_mm = `Culmen Length (mm)`,
+    bill_length_mm = `Culmen Length (mm)`,
     bill_depth_mm = `Culmen Depth (mm)`,
-    flipper_lenght_mm = `Flipper Length (mm)`,
+    flipper_length_mm = `Flipper Length (mm)`,
     body_mass_g = 7 #On peut aussi indiquer l'indice de la colonne
     ) 
 ```
@@ -295,9 +294,11 @@ data_penguin_clean %<>% rename(
 ---
 ### rename()
 
-Les noms des variables *tidy* sont toutes en minuscules, alors changeons cela également.
+Les noms des variables *tidy* et les valeurs de la colonne `sex` sont toutes en minuscules, alors changeons cela également.
 ```{r}
 data_penguin_clean %<>% rename_all(tolower)
+# En Base R
+data_penguin_clean$sex <- tolower(data_penguin_clean$sex)
 ```
 Regardons le résultat:
 --
@@ -347,31 +348,6 @@ data_penguin_clean %<>% rename(year = `date egg`) %>% relocate(year, .after = la
 ```{r echo=FALSE}
 show_head(data_penguin_clean)
 ```
----
-# Dernière étape...
-### pull()
-.pull-left[
-```{r}
-dt <- data_penguin_clean %>% pull(species)
-```
-```{r echo=FALSE}
-show_head(dt)
-```
-]
-.pull-right[
-```{r}
-dt <- data_penguin_tidy %>% pull(species)
-```
-```{r echo=FALSE}
-show_head(dt)
-```
-]  
-
-<br><center>...pour que nos données soient identiques à celles *tidy*.
-
----
- 
-
 ---
 class: inverse center middle
 #  🐧 Sommaire 🐧
@@ -505,12 +481,6 @@ show_table(dt)
 ```
 
 ---
-# Regrouper
-### rowwise()
-> `rowwise(.data, ...)`
-
----
-
 class: inverse center middle
 
 #  🐧 Joindre des *dataframes* 🐧
@@ -518,6 +488,124 @@ class: inverse center middle
 ---
 
 # Joindre des *dataframes* 
+Il y a de plusieurs possibilités et façons de joindre des *dataframes* grâce à `dplyr`, en voici quelques unes:   
+- par combinaison de variables ou d'observations: `bind_cols()` ou `bind_rows()` 
+- par "données en commun": `mutate-joins` ou `filter-joins`
+
+--
+
+On peut également faire des opérations sur ces *dataframes* pour vérifier les similarités et/ou différences
+
+<center><img src="images/join_operations.png" alt="Operations" width="400"/>
+
+---
+# Joindre des *dataframes* 
+
+Pour étudier quelques exemples de combinaison de *dataframes*, j'ai créé un 
+*dataframe* nommé `data_random` qui contient 344 observations (comme nos données)et 2 variables.
+
+```{r}
+data_random <- data.frame(random = replicate(1,sample(1:1000,344,rep=FALSE)))
+data_random  %<>% bind_cols(id = data_penguin$`Individual ID`)
+
+```
+<center>
+```{r echo=FALSE}
+  show_head(data_random)
+```
+
+*La colonne "id" correspond à la colonne "Individual ID" de `data_penguin`*
+---
+## Opérations
+
+### intersect()
+> intersect() prend les colonnes de deux dataframes et compare si leurs rangées sont identiques
+
+```{r}
+data_test <- intersect(data_penguin_clean$year, data_penguin_tidy$year)
+data_test2 <- intersect(data_random$id, data_penguin$`Individual ID`)
+```
+.pull-left[
+```{r echo=FALSE}
+show_head(data_test)
+```
+]
+.pull-right[
+```{r echo=FALSE}
+show_head(data_test2)
+```
+]
+---
+## Opérations
+
+### setdiff()
+> setdiff() prend les colonnes de deux dataframes et compare les différences entre leurs rangées.
+
+```{r}
+data_test <- setdiff(data_penguin_clean$species, data_penguin_tidy$species)
+data_test2 <- setdiff(data_random$random, data_penguin$`Individual ID`)
+```
+.pull-left[
+```{r echo=FALSE}
+show_head(data_test)
+```
+]
+.pull-right[
+```{r echo=FALSE}
+show_head(data_test2)
+```
+]
+
+---
+## Joindre des *dataframes*
+
+### mutate-joins()
+
+.pull-left[
+<center><img src="images/mutate-joins.png" alt="Operations" width="400"/>
+]
+.pull-right[
+La capture d'écran de *"Dplyr CheatSheet"* résume bien les effets des différents types de *join*.
+
+On va essayer de joindre les *dataframes* `data_random` et `data_penguin`.
+
+Rappel: les colonnes `id` et `Individual ID` des tableaux respectifs sont identiques.
+
+]
+---
+## Une image vaut mille mots
+
+<center><img src="images/joins_explained.png" alt="inner_outer_joins" width="700"/>
+<center> Diagramme emprunté à SQL
+---
+
+### left-join()
+```{r}
+joint_data_left <- left_join(data_random, data_penguin, by = c("id" = "Individual ID" ))
+```
+```{r echo=FALSE}
+show_head_sm(joint_data_left)
+```
+---
+
+### right-join()
+```{r}
+joint_data_right <- right_join(data_penguin, data_random, by = c("Individual ID" = "id"))
+```
+
+```{r echo=FALSE}
+show_head_sm(joint_data_right)
+```
+---
+
+### full-join()
+```{r}
+joint_data_full <- full_join(data_penguin, data_random, by = c("Individual ID" = "id"))
+```
+
+```{r echo=FALSE}
+show_head_sm(joint_data_full)
+```
 
 
 ---
@@ -526,6 +614,9 @@ class: center, middle
 # MERCI :) 
 
 [**xaringan**](https://github.com/yihui/xaringan)
+
+<img src="images/merci_boku.png" alt="inner_outer_joins" width="400"/>
+
 
 ---
 ## Ressources:

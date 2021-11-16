@@ -1,7 +1,13 @@
 ---
-title: "exercices"
+title: "Exercices"
 author: "Cynthia Bello"
-output: html_document
+output:
+  html_document:
+    code_folding: show
+    toc: TRUE
+    toc_float: TRUE
+    theme: yeti
+    highlight: breezedark
 ---
 
 ```{r setup, include=FALSE}
@@ -17,29 +23,60 @@ data_penguin_tidy = (penguins)
 
 ```
 
-# Exercices Dplyr pour la catégorie: Manipulation
+## Exercices Dplyr pour la catégorie: Manipulation
 
-Mettre vos résultats dans `data_penguin_clean`
+> **Vous devrez peut-être installer le package "kableExtra" si ce n'est pas déjà fait, pour un affichage des tableaux plus facile à lire, ou autre selon votre préférence: install.packages("kableExtra")**
 
-## 1. Exercice: Enlever les colonnes
+> Mettre vos résultats dans **`data_penguin_clean`**
+
+### 1. Exercice: Enlever les colonnes
+
 ### select()
-> **syntaxe:** select(df, colonne.s) ou df %>% select(colonne.s)  
+
+> **syntaxe:** select(df, colonne.s) ou df %>% select(colonne.s)
 
 ```{r}
 
 ```
 
+```{r echo=FALSE}
+# Affichage des 5 premières lignes du tableau
+# kable(head(data_penguin_clean)) %>%
+#     kable_styling(full_width = F, font_size = 14)
+```
+
 ------------------------------------------------------------------------
 
-## 2. Exercice: Changer le nom des colonnes
+### 2. Exercice: Changer le nom des colonnes
 
 ### rename()
-> **syntaxe:** rename(df, nouv_nom = ancien_nom) <u>*ou*</u> df %>% rename(nouv_nom = ancien_nom) 
+
+> **syntaxe:** rename(df, nouv_nom = ancien_nom) <u>*ou*</u> df %>% rename(nouv_nom = ancien_nom)
 
 ```{r}
 
 ```
 
+```{r echo=FALSE}
+# Affichage des 5 premières lignes du tableau
+# kable(head(data_penguin_clean)) %>%
+#     kable_styling(full_width = F, font_size = 14)
+```
 ------------------------------------------------------------------------
 
-## 3. Exercice: Extraire année de la variable *Date Egg*
+### 3. Exercice: Extraire année de la variable *date egg*
+
+Pour obtenir une colonne `year` avec l'année de la colonne `date egg`, on pourrait extraire l'année seulement puis la placer dans une nouvelle colonne à la fin du *dataframe* grâce à ...
+
+### mutate()
+
+> **syntaxe:** mutate(df, nouvelle_colonne) <u>*ou*</u> df %>% mutate(nouvelle_colonne)
+
+```{r}
+
+```
+```{r echo=FALSE}
+# Affichage des 5 premières lignes du tableau
+# kable(head(data_penguin_clean)) %>%
+#     kable_styling(full_width = F, font_size = 14)
+```
