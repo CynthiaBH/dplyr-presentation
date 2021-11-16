@@ -35,6 +35,10 @@ data_penguin_tidy = (penguins)
 
 > **syntaxe:** select(df, colonne.s) ou df %>% select(colonne.s)
 
+**Colonnes à enlever:**  
+studyName, Sample Number, Region, Stage, Individual ID, Clutch Completion, Delta 15 N, Delta 13 C, Comments
+
+
 ```{r}
 
 ```
@@ -52,6 +56,12 @@ data_penguin_tidy = (penguins)
 ### rename()
 
 > **syntaxe:** rename(df, nouv_nom = ancien_nom) <u>*ou*</u> df %>% rename(nouv_nom = ancien_nom)
+
+- `Culmen lenght (mm)`  devient `bill_lenght_mm` 
+- `Culmen depth (mm)`  devient `bill_depth_mm` 
+- `Flipper lenght (mm)`  devient `flipper_lenght_mm` 
+- `Body Mass (g)`  devient `body_mass_g` 
+
 
 ```{r}
 
@@ -71,6 +81,12 @@ Pour obtenir une colonne `year` avec l'année de la colonne `date egg`, on pourr
 ### mutate()
 
 > **syntaxe:** mutate(df, nouvelle_colonne) <u>*ou*</u> df %>% mutate(nouvelle_colonne)
+
+On pourrait aussi, ne garder que l'année dans la colonne `date egg`, changer le nom de la colonne, puis la déplacer en dernière position du *dataframe* grâce à ... 
+
+
+### relocate()
+> relocate(df, ..., .before = NULL, .after = NULL) *par défaut va placer la colonne en premier*
 
 ```{r}
 

@@ -262,6 +262,8 @@ div.tocify {
 <blockquote>
 <p><strong>syntaxe:</strong> select(df, colonne.s) ou df %&gt;% select(colonne.s)</p>
 </blockquote>
+<p><strong>Colonnes à enlever:</strong><br />
+studyName, Sample Number, Region, Stage, Individual ID, Clutch Completion, Delta 15 N, Delta 13 C, Comments</p>
 <hr />
 </div>
 <div id="exercice-changer-le-nom-des-colonnes" class="section level3">
@@ -272,6 +274,12 @@ div.tocify {
 <blockquote>
 <p><strong>syntaxe:</strong> rename(df, nouv_nom = ancien_nom) <u><em>ou</em></u> df %&gt;% rename(nouv_nom = ancien_nom)</p>
 </blockquote>
+<ul>
+<li><code>Culmen lenght (mm)</code> devient <code>bill_lenght_mm</code></li>
+<li><code>Culmen depth (mm)</code> devient <code>bill_depth_mm</code></li>
+<li><code>Flipper lenght (mm)</code> devient <code>flipper_lenght_mm</code></li>
+<li><code>Body Mass (g)</code> devient <code>body_mass_g</code></li>
+</ul>
 <hr />
 </div>
 <div id="exercice-extraire-année-de-la-variable-date-egg" class="section level3">
@@ -282,6 +290,13 @@ div.tocify {
 <h3>mutate()</h3>
 <blockquote>
 <p><strong>syntaxe:</strong> mutate(df, nouvelle_colonne) <u><em>ou</em></u> df %&gt;% mutate(nouvelle_colonne)</p>
+</blockquote>
+<p>On pourrait aussi, ne garder que l’année dans la colonne <code>date egg</code>, changer le nom de la colonne, puis la déplacer en dernière position du <em>dataframe</em> grâce à …</p>
+</div>
+<div id="relocate" class="section level3">
+<h3>relocate()</h3>
+<blockquote>
+<p>relocate(df, …, .before = NULL, .after = NULL) <em>par défaut va placer la colonne en premier</em></p>
 </blockquote>
 </div>
 </div>

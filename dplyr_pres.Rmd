@@ -218,7 +218,6 @@ kable(head(data_penguin_tidy), caption = "Données Tidy") %>%
 1. <u>Enlever des colonnes:</u> 
   - `studyName, Sample Number, Region, Stage, Individual ID, Clutch Completion, Delta 15 N, Delta 13 C, Comments`
 1. <u>Changer le nom des colonnes:</u>
-  - `Date Egg`  devient `year` 
   - `Culmen lenght (mm)`  devient `bill_lenght_mm` 
   - `Culmen depth (mm)`  devient `bill_depth_mm` 
   - `Flipper lenght (mm)`  devient `flipper_lenght_mm` 
@@ -338,6 +337,8 @@ On aurait pu aussi, ne garder que l'année dans la colonne `date egg`, changer l
 
 ### relocate()
 > relocate(df, ..., .before = NULL, .after = NULL) *par défaut va placer la colonne en premier*
+
+--
 
 ```{r}
 data_penguin_clean$`date egg` <- format(data_penguin_clean$`date egg`, format="%Y")
