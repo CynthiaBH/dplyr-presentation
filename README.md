@@ -1,5 +1,5 @@
 # dplyr-presentation
-Présentation du package Dplyr du Tidyverse : https://cynthiabh.github.io/dplyr-presentation/dplyr_pres
+Présentation du package Dplyr du Tidyverse : https://cynthiabh.github.io/dplyr-presentation/
 
 Utilisation du *package* `dplyr` du Tidyverse sur l'ensemble de données de [palmerpenguins](https://allisonhorst.github.io/palmerpenguins/reference/penguins_raw.html#format)
 
