@@ -29,9 +29,24 @@ class: center, middle, inverse, title-slide
 &lt;img src="images/dplyr_logo.png" alt="Dplyr_logo" width="300"/&gt;
 ]
 
-.pull-right[`Dplyr` est un package de l'univers Tidyverse qui a pour but de faciliter la manipulation de données. &lt;br&gt;&lt;br&gt; `Dplyr` est fortement inspiré du package `plyr`, mais vient régler des problèmes de lenteur des programmes, en permettant de travailler avec des données contenues dans des bases de données externes.
+.pull-right[`Dplyr` est un package de l'univers Tidyverse qui a pour but de faciliter la manipulation de données. &lt;br&gt;&lt;br&gt; `Dplyr` est fortement inspiré du package `plyr`, mais vient régler des problèmes de lenteur des programmes, entre autres en permettant de travailler avec des données contenues dans des bases de données externes.
 ]
+---
+## *Cheat Sheet*
 
+Les différentes fonctions et possibilités avec Dplyr sont réunies dans **Data transformation with dplyr : : CHEAT SHEET**  
+![Cheatsheet](images/cheat_sheets_snap.png)
+---
+## *Cheat Sheet*
+
+.pull-left[
+![](images/cheat_sheets.png)
+]
+.pull-right[
+### Sur github.com/CynthiaBH : 
+
+[data-transformation.pdf](data-transformation.pdf)
+]
 ---
 class: center
 
@@ -63,7 +78,7 @@ class: inverse center middle
 ---
 class: center, middle
 
-### Manipuler 
+### Manipulation 
 --
 
 ### Sommaire 
@@ -72,10 +87,12 @@ class: center, middle
 ### Regrouper 
 --
 
-### Fonctions vectorielles 
---
+### Joindre des *dataframes*  
 
-### Joindre des tableaux 
+---
+## Petites notes: 
+À certains endroits, je vais utiliser:
+- `%&lt;&gt;%` emprunté à *Magrittr* pour écrire `dataframe %&lt;&gt;% fonction`  au lieu de `dataframe &lt;- dataframe %&gt;% fonction`
 
 ---
 ## Avant de commencer...
@@ -98,7 +115,18 @@ Nous voulons quand même garder une version des données brutes, alors nous allo
 &lt;center&gt;`data_calcs`
 
 ---
-# Manipuler
+class: inverse center middle
+#  🐧 Manipulation 🐧
+
+---
+
+# Manipulation
+&lt;center&gt;&lt;img src="images/dplyr_vs_baseR.png" alt="Dplyr vs Base" width="550"/&gt;
+&lt;div class="caption"&gt;Source: https://cran.r-project.org&lt;/div&gt;
+
+
+---
+# Manipulation
 ### filter()  
 --
 
@@ -142,16 +170,793 @@ data_calcs %&gt;% count()
 
 Ceci va nous éviter de spécifier **`!is.na`** ou **`na.rm = TRUE`** à chaque fois.
 
+
 ---
-# Manipuler
+
+&gt; Si on veut vraiment vérifier s'il n'y a pas de valeur **NA** restantes dans nos 4 colonnes, on peut utiliser une autre fonction de `dplyr`  
+
+--
+
+### select()
+
+
+```r
+data_calcs %&gt;%  select(10:13) %&gt;% summarise_all(list(~sum(is.na(.))))
+```
+
+```
+## # A tibble: 1 x 4
+##   `Culmen Length (mm)` `Culmen Depth (mm)` `Flipper Length (mm~ `Body Mass (g)`
+##                  &lt;int&gt;               &lt;int&gt;                &lt;int&gt;           &lt;int&gt;
+## 1                    0                   0                    0               0
+```
+
+--
+
+&lt;u&gt;En Base R&lt;/u&gt;
+
+```r
+which(is.na(data_calcs[10:13]))
+```
+
+```
+## integer(0)
+```
+---
+
+# Manipulation
 
 &lt;u&gt;**Objectif**&lt;/u&gt; : "Nettoyer" nos données brutes pour arriver aux données *tidy* disponibles sur le site de [palmerpenguins](https://allisonhorst.github.io/palmerpenguins/reference/penguins_raw.html#format)
 
 
 
+```r
+kable(head(data_penguin), caption = "Données Brutes") %&gt;%
+    kable_styling(full_width = F, font_size = 10)
+```
+
+&lt;table class="table" style="font-size: 10px; width: auto !important; margin-left: auto; margin-right: auto;"&gt;
+&lt;caption style="font-size: initial !important;"&gt;Données Brutes&lt;/caption&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; studyName &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Sample Number &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Species &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Region &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Island &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Stage &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Individual ID &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Clutch Completion &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Date Egg &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Culmen Length (mm) &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Culmen Depth (mm) &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Flipper Length (mm) &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Body Mass (g) &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Sex &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Delta 15 N (o/oo) &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Delta 13 C (o/oo) &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Comments &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; PAL0708 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 1 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Adelie Penguin (Pygoscelis adeliae) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Anvers &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Torgersen &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Adult, 1 Egg Stage &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; N1A1 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Yes &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2007-11-11 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 39.1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 18.7 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 181 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3750 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; MALE &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Not enough blood for isotopes. &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; PAL0708 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Adelie Penguin (Pygoscelis adeliae) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Anvers &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Torgersen &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Adult, 1 Egg Stage &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; N1A2 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Yes &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2007-11-11 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 39.5 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 17.4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 186 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3800 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; FEMALE &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 8.94956 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -24.69454 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; PAL0708 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Adelie Penguin (Pygoscelis adeliae) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Anvers &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Torgersen &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Adult, 1 Egg Stage &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; N2A1 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Yes &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2007-11-16 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 40.3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 18.0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 195 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3250 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; FEMALE &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 8.36821 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -25.33302 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; PAL0708 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 4 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Adelie Penguin (Pygoscelis adeliae) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Anvers &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Torgersen &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Adult, 1 Egg Stage &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; N2A2 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Yes &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2007-11-16 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Adult not sampled. &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; PAL0708 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 5 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Adelie Penguin (Pygoscelis adeliae) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Anvers &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Torgersen &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Adult, 1 Egg Stage &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; N3A1 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Yes &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2007-11-16 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 36.7 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 19.3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 193 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3450 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; FEMALE &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 8.76651 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -25.32426 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; PAL0708 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 6 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Adelie Penguin (Pygoscelis adeliae) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Anvers &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Torgersen &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Adult, 1 Egg Stage &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; N3A2 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Yes &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2007-11-16 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 39.3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 20.6 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 190 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3650 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; MALE &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 8.66496 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; -25.29805 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
 ---
+class: center, middle
+
+```r
+kable(head(data_penguin_tidy), caption = "Données Tidy") %&gt;%
+    kable_styling(full_width = F, font_size = 20)
+```
+
+&lt;table class="table" style="font-size: 20px; width: auto !important; margin-left: auto; margin-right: auto;"&gt;
+&lt;caption style="font-size: initial !important;"&gt;Données Tidy&lt;/caption&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; species &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; island &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; bill_length_mm &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; bill_depth_mm &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; flipper_length_mm &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; body_mass_g &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; sex &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; year &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Adelie &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Torgersen &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 39.1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 18.7 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 181 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3750 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; male &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2007 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Adelie &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Torgersen &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 39.5 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 17.4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 186 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3800 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; female &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2007 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Adelie &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Torgersen &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 40.3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 18.0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 195 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3250 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; female &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2007 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Adelie &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Torgersen &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2007 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Adelie &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Torgersen &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 36.7 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 19.3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 193 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3450 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; female &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2007 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Adelie &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Torgersen &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 39.3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 20.6 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 190 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3650 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; male &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 2007 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+---
+
+### &lt;u&gt;Éléments à modifier&lt;/u&gt;
+1. &lt;u&gt;Enlever des colonnes:&lt;/u&gt; 
+  - `studyName, Sample Number, Region, Stage, Individual ID, Clutch Completion, Delta 15 N, Delta 13 C, Comments`
+1. &lt;u&gt;Changer le nom des colonnes:&lt;/u&gt;
+  - `Date Egg`  devient `year` 
+  - `Culmen lenght (mm)`  devient `bill_lenght_mm` 
+  - `Culmen depth (mm)`  devient `bill_depth_mm` 
+  - `Flipper lenght (mm)`  devient `flipper_lenght_mm` 
+  - `Body Mass (g)`  devient `body_mass_g` 
+1. Extraire année de la variable `Date Egg` qui devient `year`
+1. Déplacer colonne `year`  
+
+&gt; &lt;center&gt;*Le résultat des modifications à `data_penguin` (données brutes) sera sauvegardé dans `data_penguin_clean` dans la prochaine section.* 
+
+
+---
+## 1. Exercice: Enlever des colonnes
+
+### select()
+&gt; **syntaxe:** select(df, colonne.s) &lt;u&gt;*ou*&lt;/u&gt; df %&gt;% select(colonne.s)  
+
+✏️Essayez !  
+--
+
+&lt;u&gt;Une réponse possible:&lt;/u&gt;
+
+```r
+#Sélectionner que les colonnes qui restent
+data_penguin_clean &lt;- data_penguin %&gt;% select(c(3,5,9:14))
+```
+&lt;table class="table" style="font-size: 14px; width: auto !important; margin-left: auto; margin-right: auto;"&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; Species &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Island &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Date Egg &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Culmen Length (mm) &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Culmen Depth (mm) &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Flipper Length (mm) &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; Body Mass (g) &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; Sex &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Adelie Penguin (Pygoscelis adeliae) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Torgersen &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2007-11-11 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 39.1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 18.7 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 181 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3750 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; MALE &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Adelie Penguin (Pygoscelis adeliae) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Torgersen &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2007-11-11 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 39.5 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 17.4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 186 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3800 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; FEMALE &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Adelie Penguin (Pygoscelis adeliae) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Torgersen &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2007-11-16 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 40.3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 18.0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 195 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3250 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; FEMALE &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Adelie Penguin (Pygoscelis adeliae) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Torgersen &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2007-11-16 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Adelie Penguin (Pygoscelis adeliae) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Torgersen &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2007-11-16 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 36.7 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 19.3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 193 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3450 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; FEMALE &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Adelie Penguin (Pygoscelis adeliae) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Torgersen &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2007-11-16 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 39.3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 20.6 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 190 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3650 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; MALE &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+---
+&lt;u&gt;Autre réponse possible:&lt;/u&gt;
+
+```r
+# Sélectionner les colonnes à enlever
+data_penguin_clean &lt;- data_penguin %&gt;% select(-c(1,2,4,6:8,15:17))
+```
+--
+
+On pourrait lister les colonnes par nom également  
+--
+
+... et sûrement plusieurs autres possibilités
+--
+
+### Autres caractéristiques de sélection pour select()
+- everything()
+- last_col()
+- starts_with()
+- ends_with()
+- contains()
+- matches()
+- num_range()
+- where()
+
+Il y a aussi: `select_if, select_all, select_at`
+---
+## 2. Exercice: Changer le nom des colonnes
+
+### rename()
+&gt; **syntaxe:** rename(df, nouv_nom = ancien_nom) &lt;u&gt;*ou*&lt;/u&gt; df %&gt;% rename(nouv_nom = ancien_nom) 
+
+✏️Essayez !  
+--
+
+&lt;u&gt;Une réponse possible:&lt;/u&gt;
+
+```r
+data_penguin_clean %&lt;&gt;% rename(
+    bill_lenght_mm = `Culmen Length (mm)`,
+    bill_depth_mm = `Culmen Depth (mm)`,
+    flipper_lenght_mm = `Flipper Length (mm)`,
+    body_mass_g = 7 #On peut aussi indiquer l'indice de la colonne
+    ) 
+```
+
+---
+### rename()
+
+Les noms des variables *tidy* sont toutes en minuscules, alors changeons cela également.
+
+```r
+data_penguin_clean %&lt;&gt;% rename_all(tolower)
+```
+Regardons le résultat:
+--
+
+&lt;table class="table" style="font-size: 14px; width: auto !important; margin-left: auto; margin-right: auto;"&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; species &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; island &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; date egg &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; bill_lenght_mm &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; bill_depth_mm &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; flipper_lenght_mm &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; body_mass_g &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; sex &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Adelie Penguin (Pygoscelis adeliae) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Torgersen &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2007-11-11 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 39.1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 18.7 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 181 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3750 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; MALE &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Adelie Penguin (Pygoscelis adeliae) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Torgersen &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2007-11-11 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 39.5 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 17.4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 186 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3800 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; FEMALE &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Adelie Penguin (Pygoscelis adeliae) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Torgersen &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2007-11-16 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 40.3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 18.0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 195 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3250 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; FEMALE &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Adelie Penguin (Pygoscelis adeliae) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Torgersen &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2007-11-16 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Adelie Penguin (Pygoscelis adeliae) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Torgersen &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2007-11-16 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 36.7 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 19.3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 193 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3450 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; FEMALE &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Adelie Penguin (Pygoscelis adeliae) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Torgersen &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2007-11-16 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 39.3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 20.6 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 190 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3650 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; MALE &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+--  
+
+Comme `select()`, il y a aussi: `rename_if, rename_all, rename_at`
+---
+## 3. Exercice: Extraire année de la variable *date egg*
+Pour obtenir une colonne `year` avec l'année de la colonne `date egg`, on pourrait extraire l'année seulement puis la placer dans une nouvelle colonne à la fin du *dataframe* grâce à ...
+--
+
+### mutate() ou transmute()
+&gt; **syntaxe:** mutate(df, nouvelle_colonne)  &lt;u&gt;*ou*&lt;/u&gt;  df %&gt;% mutate(nouvelle_colonne)
+
+✏️Essayez !  
+--
+
+&lt;u&gt;Une réponse possible:&lt;/u&gt;
+
+```r
+dt &lt;- data_penguin_clean %&gt;% mutate(year = format(`date egg`, format="%Y"))
+dt %&lt;&gt;% select(-3) #enlever l'ancienne colonne `date egg`
+```
+&lt;table class="table" style="font-size: 14px; width: auto !important; margin-left: auto; margin-right: auto;"&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; species &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; island &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; bill_lenght_mm &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; bill_depth_mm &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; flipper_lenght_mm &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; body_mass_g &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; sex &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; year &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Adelie Penguin (Pygoscelis adeliae) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Torgersen &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 39.1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 18.7 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 181 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3750 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; MALE &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2007 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Adelie Penguin (Pygoscelis adeliae) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Torgersen &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 39.5 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 17.4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 186 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3800 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; FEMALE &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2007 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Adelie Penguin (Pygoscelis adeliae) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Torgersen &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 40.3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 18.0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 195 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3250 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; FEMALE &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2007 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Adelie Penguin (Pygoscelis adeliae) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Torgersen &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2007 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Adelie Penguin (Pygoscelis adeliae) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Torgersen &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 36.7 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 19.3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 193 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3450 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; FEMALE &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2007 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Adelie Penguin (Pygoscelis adeliae) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Torgersen &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 39.3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 20.6 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 190 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3650 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; MALE &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2007 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+
+---
+## 3. Exercice: Extraire année de la variable *Date Egg* (suite)
+
+On aurait pu aussi, ne garder que l'année dans la colonne `date egg`, changer le nom de la colonne, puis la déplacer en dernière position du *dataframe* grâce à ... 
+
+--
+
+### relocate()
+&gt; relocate(df, ..., .before = NULL, .after = NULL) *par défaut va placer la colonne en premier*
+
+
+```r
+data_penguin_clean$`date egg` &lt;- format(data_penguin_clean$`date egg`, format="%Y")
+data_penguin_clean %&lt;&gt;% rename(year = `date egg`) %&gt;% relocate(year, .after = last_col()) 
+```
+--
+
+&lt;table class="table" style="font-size: 14px; width: auto !important; margin-left: auto; margin-right: auto;"&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; species &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; island &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; bill_lenght_mm &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; bill_depth_mm &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; flipper_lenght_mm &lt;/th&gt;
+   &lt;th style="text-align:right;"&gt; body_mass_g &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; sex &lt;/th&gt;
+   &lt;th style="text-align:left;"&gt; year &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Adelie Penguin (Pygoscelis adeliae) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Torgersen &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 39.1 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 18.7 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 181 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3750 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; MALE &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2007 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Adelie Penguin (Pygoscelis adeliae) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Torgersen &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 39.5 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 17.4 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 186 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3800 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; FEMALE &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2007 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Adelie Penguin (Pygoscelis adeliae) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Torgersen &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 40.3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 18.0 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 195 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3250 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; FEMALE &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2007 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Adelie Penguin (Pygoscelis adeliae) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Torgersen &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; NA &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2007 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Adelie Penguin (Pygoscelis adeliae) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Torgersen &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 36.7 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 19.3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 193 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3450 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; FEMALE &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2007 &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Adelie Penguin (Pygoscelis adeliae) &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; Torgersen &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 39.3 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 20.6 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 190 &lt;/td&gt;
+   &lt;td style="text-align:right;"&gt; 3650 &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; MALE &lt;/td&gt;
+   &lt;td style="text-align:left;"&gt; 2007 &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+---
+# Dernière étape...
+### pull()
+.pull-left[
+
+```r
+dt &lt;- data_penguin_clean %&gt;% pull(species)
+```
+&lt;table class="table" style="font-size: 14px; width: auto !important; margin-left: auto; margin-right: auto;"&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; x &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Adelie Penguin (Pygoscelis adeliae) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Adelie Penguin (Pygoscelis adeliae) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Adelie Penguin (Pygoscelis adeliae) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Adelie Penguin (Pygoscelis adeliae) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Adelie Penguin (Pygoscelis adeliae) &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Adelie Penguin (Pygoscelis adeliae) &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+]
+.pull-right[
+
+```r
+dt &lt;- data_penguin_tidy %&gt;% pull(species)
+```
+&lt;table class="table" style="font-size: 14px; width: auto !important; margin-left: auto; margin-right: auto;"&gt;
+ &lt;thead&gt;
+  &lt;tr&gt;
+   &lt;th style="text-align:left;"&gt; x &lt;/th&gt;
+  &lt;/tr&gt;
+ &lt;/thead&gt;
+&lt;tbody&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Adelie &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Adelie &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Adelie &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Adelie &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Adelie &lt;/td&gt;
+  &lt;/tr&gt;
+  &lt;tr&gt;
+   &lt;td style="text-align:left;"&gt; Adelie &lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+]  
+
+&lt;br&gt;&lt;center&gt;...pour que nos données soient identiques à celles *tidy*.
+
+---
+ 
+
+---
+class: inverse center middle
+#  🐧 Sommaire 🐧
+
+---
+
 # Sommaire
-#### summarise():
+### summarise():
 &gt; summarise(.data, ..., .groups = NULL )
 
 
@@ -176,7 +981,9 @@ data_calcs %&gt;% summarise(med_flipper = median(`Flipper Length (mm)`))
 ##         &lt;dbl&gt;
 ## 1         197
 ```
+
 --
+
 &lt;u&gt;Autres fonctions qui peuvent être utilisées avec `summarise()`:&lt;/u&gt;  
 `sd(), IQR(), mad(),min(), max(), quantile(),first(), last(), nth(),n(), n_distinct(),any(), all()`
 
@@ -336,6 +1143,11 @@ Il y a aussi `summarise_at` et `summarise_all`
 
 ---
 
+class: inverse center middle
+
+#  🐧 Regrouper 🐧
+
+---
 # Regrouper
 
 ### group_by() &amp; ungroup()
@@ -556,12 +1368,13 @@ dt &lt;- data_calcs %&gt;% group_by(Species,Region, Island, Sex) %&gt;% summariz
 
 ---
 
-# Fonctions vectorielles
+class: inverse center middle
+
+#  🐧 Joindre des *dataframes* 🐧
 
 ---
 
-
-# Joindre des tableaux
+# Joindre des *dataframes* 
 
 
 ---
@@ -569,10 +1382,16 @@ class: center, middle
 
 # MERCI :) 
 
-[**xaringan**](https://github.com/yihui/xaringan)&lt;br&gt;
+[**xaringan**](https://github.com/yihui/xaringan)
 
 ---
 ## Ressources:
+
+- [Cran R-project/Dplyr](https://cran.r-project.org/web/packages/dplyr/vignettes/base.html)
+- [R for Data Science](https://r4ds.had.co.nz/transform.html)
+- [Data Carpentry](https://datacarpentry.org/R-genomics/04-dplyr.html)
+- [Tidyverse/Dplyr](https://dplyr.tidyverse.org/index.html)
+
 
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>

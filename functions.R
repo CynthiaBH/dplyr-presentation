@@ -12,6 +12,11 @@ show_table_sm <- function(dt){
     kbl() %>%
     kable_styling(full_width = F, font_size = 12)
 }
+# Fonction d'affichage de grands tableaux - head seulement
+show_head <- function(dt){
+    kable(head(dt)) %>%
+    kable_styling(full_width = F, font_size = 14)
+}
 
 # Arrondir
 arrondir <- function(dt, variable, valeur){

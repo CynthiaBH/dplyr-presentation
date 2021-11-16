@@ -1,0 +1,45 @@
+---
+title: "exercices"
+author: "Cynthia Bello"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(kableExtra)
+library(palmerpenguins)
+```
+
+```{r echo=FALSE}
+data_penguin = (penguins_raw)
+data_penguin_tidy = (penguins)
+
+```
+
+# Exercices Dplyr pour la catégorie: Manipulation
+
+Mettre vos résultats dans `data_penguin_clean`
+
+## 1. Exercice: Enlever les colonnes
+### select()
+> **syntaxe:** select(df, colonne.s) ou df %>% select(colonne.s)  
+
+```{r}
+
+```
+
+------------------------------------------------------------------------
+
+## 2. Exercice: Changer le nom des colonnes
+
+### rename()
+> **syntaxe:** rename(df, nouv_nom = ancien_nom) <u>*ou*</u> df %>% rename(nouv_nom = ancien_nom) 
+
+```{r}
+
+```
+
+------------------------------------------------------------------------
+
+## 3. Exercice: Extraire année de la variable *Date Egg*
